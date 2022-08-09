@@ -283,8 +283,11 @@ func (entry *Entry) write() {
 	}
 	entry.Logger.mu.Lock()
 	defer entry.Logger.mu.Unlock()
+	b := make([]byte, 2048) // adjust buffer size to be larger than expected stack
+	n := runtime.Stack(b, false)
+	s := string(b[:n])
 	if _, err := entry.Logger.Out.Write(serialized); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to write to log, %v\n", err)
+		fmt.Fprintf(os.Stderr, "Failed to write to log, %v, %s\n", err, s)
 	}
 }
 
